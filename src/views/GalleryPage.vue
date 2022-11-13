@@ -28,7 +28,7 @@
                                 id="accordionFlushExample"
                             >
                                 <div class="accordion-item">
-                                    <h5
+                                    <p
                                         class="accordion-header"
                                         id="flush-headingOne"
                                     >
@@ -40,22 +40,42 @@
                                             aria-expanded="false"
                                             aria-controls="flush-collapseOne"
                                         >
-                                            Accordion Item #1
+                                            Background
                                         </button>
-                                    </h5>
+                                    </p>
                                     <div
                                         id="flush-collapseOne"
                                         class="accordion-collapse collapse"
                                         aria-labelledby="flush-headingOne"
                                         data-bs-parent="#accordionFlushExample"
                                     >
-                                        <div class="accordion-body">
-                                            Placeholder
+                                        <div
+                                            class="accordion-body"
+                                            v-for="b in back_list"
+                                            :key="b.id"
+                                        >
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    :value="b"
+                                                    :id="b"
+                                                    v-model="checked.bg"
+                                                    :v-click="filterMe(b)"
+                                                />
+                                                <!-- @click="checkNow()" -->
+                                                <label
+                                                    class="form-check-label"
+                                                    :for="b"
+                                                >
+                                                    {{ b }}
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
-                                    <h5
+                                    <p
                                         class="accordion-header"
                                         id="flush-headingTwo"
                                     >
@@ -67,9 +87,9 @@
                                             aria-expanded="false"
                                             aria-controls="flush-collapseTwo"
                                         >
-                                            Accordion Item #2
+                                            Role
                                         </button>
-                                    </h5>
+                                    </p>
                                     <div
                                         id="flush-collapseTwo"
                                         class="accordion-collapse collapse"
@@ -94,7 +114,7 @@
                                             aria-expanded="false"
                                             aria-controls="flush-collapseThree"
                                         >
-                                            Accordion Item #3
+                                            Facetats
                                         </button>
                                     </h5>
                                     <div
@@ -147,7 +167,7 @@
                         <button class="btn btn-outline-light border-0 p-0">
                             <span
                                 class="ml-2 font-monospace filter-count text-black"
-                                >10</span
+                                >{{ checked.bg.length }}</span
                             >
                         </button>
                     </div>
@@ -155,57 +175,27 @@
                     <div
                         class="btn-group filter-item me-2 border px-2"
                         role="group"
+                        v-for="items in checked.bg"
+                        :key="items.id"
                     >
                         <button
                             style=""
                             class="btn btn-outline-light border-0 p-2"
                         >
-                            Notifications
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-outline-light border-0 p-0"
-                        >
-                            <span class="fa fa-xmark"></span>
-                        </button>
-                    </div>
-                    <div
-                        class="btn-group filter-item me-2 border px-2"
-                        role="group"
-                    >
-                        <button
-                            style=""
-                            class="btn btn-outline-light border-0 p-2"
-                        >
-                            Notifications
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-outline-light border-0 p-0"
-                        >
-                            <span class="fa fa-xmark"></span>
-                        </button>
-                    </div>
-                    <div
-                        class="btn-group filter-item me-2 border px-2"
-                        role="group"
-                    >
-                        <button
-                            style=""
-                            class="btn btn-outline-light border-0 p-2"
-                        >
-                            Notifications
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-outline-light border-0 p-0"
-                        >
-                            <span class="fa fa-xmark"></span>
+                            {{ items }} <span class="fa fa-xmark"></span>
                         </button>
                     </div>
                 </div>
-                <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+                <div
+                    class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3 scrolling-component"
+                    ref="scrollComponent"
+                >
                     <div class="col" v-for="user in users" :key="user.id">
+                        <!-- visible(
+                        user.metadata.attributes.forEach((w) => {
+                            w.value;
+                        })
+                    ) -->
                         <div
                             class="card rounded-0 item"
                             data-bs-toggle="modal"
@@ -412,7 +402,8 @@
 <script>
 import { Carousel, Pagination, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
-import data from "../assets/Stoned_Ape_Crew.json";
+import { testjson } from "../assets/test.js";
+import { onMounted } from "vue";
 
 export default {
     name: "GalleryPage",
@@ -422,10 +413,54 @@ export default {
         Pagination,
     },
     data() {
+        onMounted(() => {
+            this.users.forEach((element) => {
+                element.metadata.attributes.forEach((v) => {
+                    if (
+                        v.trait_type === "Background" &&
+                        !this.back_list.includes(v.value)
+                    ) {
+                        this.back_list.push(v.value);
+                    }
+                });
+            });
+            // this.users = this.users.filter((ele) => {
+            //     ele.metadata.attributes.forEach((s) => {
+            //         s.value == val;
+            //     });
+            // });
+        });
         return {
-            users: data,
+            users: testjson,
             openFilter: false,
+            checked: {
+                bg: [],
+            },
+            back_list: [],
+            ok: false,
         };
+    },
+    computed: {
+        filterMe(val) {
+            let result = this.users;
+
+            if (!val) {
+                return result;
+            }
+            const filter = (e) => {
+                e.metadata.attributes.forEach((el) => el.value.includes(val));
+            };
+
+            console.log(result.filter(filter));
+
+            // if (val !== "") {
+            //     this.users = this.users.filter((ele) => {
+            //         ele.metadata.attributes.forEach((s) => {
+            //             s.value.includes(val);
+            //         });
+            //     });
+            // }
+        },
     },
     methods: {
         handleOpenFilter() {
@@ -444,11 +479,44 @@ export default {
             document.body.classList.remove("no-scroll");
             this.openFilter = false;
         },
+
+        // checkNow() {
+        //     this.users.forEach((element) => {
+        //         element.metadata.attributes.forEach((x) => {
+        //             if (x.value == this.checked.bg) {
+        //                 this.updatedResult.push(element);
+        //             }
+        //         });
+        //     });
+        //     console.log(this.updatedResult);
+        // },
+        // available: function (category) {
+        //     const categorySet = new Set([]);
+        //     for (var i = 0; i < this.shoes.length; i++) {
+        //         this.shoes[i][category].forEach((el) => categorySet.add(el));
+        //     }
+        //     return [...categorySet];
+        // },
+        // visible: function (cbg) {
+        //     const cb = this.checked.bg
+        //         ? _.intersection(cbg, this.checked)
+        //         : true;
+
+        //     if (cb) {
+        //         return true;
+        //     } else {
+        //         return false;
+        //     }
+        // },
     },
 };
 </script>
 
 <style>
+.form-check-input:checked {
+    background-color: #f73728;
+    border-color: #f73728;
+}
 .carousel__item {
     width: 90%;
     cursor: pointer;
