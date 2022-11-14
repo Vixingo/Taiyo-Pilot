@@ -61,8 +61,8 @@
                                                     :value="b"
                                                     :id="b"
                                                     v-model="checked.bg"
-                                                    :v-click="filterMe(b)"
                                                 />
+                                                <!-- :v-click="filterMe(b)" -->
                                                 <!-- @click="checkNow()" -->
                                                 <label
                                                     class="form-check-label"
@@ -143,7 +143,7 @@
                         role="group"
                     >
                         <button style="" class="btn btn-outline-light border-0">
-                            Total:{{ users.length }}
+                            Total:{{ fill.length }}
                         </button>
                         <button
                             type="button"
@@ -190,7 +190,7 @@
                     class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3 scrolling-component"
                     ref="scrollComponent"
                 >
-                    <div class="col" v-for="user in users" :key="user.id">
+                    <div class="col" v-for="user in fill" :key="user.id">
                         <!-- visible(
                         user.metadata.attributes.forEach((w) => {
                             w.value;
@@ -438,28 +438,18 @@ export default {
             },
             back_list: [],
             ok: false,
+            search: "OG Stoner ",
         };
     },
     computed: {
-        filterMe(val) {
-            let result = this.users;
-
-            if (!val) {
-                return result;
+        fill() {
+            if (!this.search) {
+                return testjson;
+            } else {
+                return testjson.filter((e) => {
+                    return e.metadata.name.includes(this.search);
+                });
             }
-            const filter = (e) => {
-                e.metadata.attributes.forEach((el) => el.value.includes(val));
-            };
-
-            console.log(result.filter(filter));
-
-            // if (val !== "") {
-            //     this.users = this.users.filter((ele) => {
-            //         ele.metadata.attributes.forEach((s) => {
-            //             s.value.includes(val);
-            //         });
-            //     });
-            // }
         },
     },
     methods: {
@@ -478,6 +468,21 @@ export default {
             menu.classList.remove("d-none");
             document.body.classList.remove("no-scroll");
             this.openFilter = false;
+        },
+        filterMe(val) {
+            this.searched = this.users;
+
+            this.searched = this.users.filter((e) => {
+                e.metadata.attributes.forEach((el) => el.value.includes(val));
+            });
+
+            // if (val !== "") {
+            //     this.users = this.users.filter((ele) => {
+            //         ele.metadata.attributes.forEach((s) => {
+            //             s.value.includes(val);
+            //         });
+            //     });
+            // }
         },
 
         // checkNow() {
