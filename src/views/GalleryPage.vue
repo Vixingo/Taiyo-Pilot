@@ -404,6 +404,7 @@ import { Carousel, Pagination, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
 import { testjson } from "../assets/test.js";
 import { onMounted } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 
 export default {
     name: "GalleryPage",
@@ -434,15 +435,16 @@ export default {
             users: testjson,
             openFilter: false,
             checked: {
-                bg: [],
+                bg: ["OG Stoner", "Stoned Ape #1664"],
             },
             back_list: [],
             ok: false,
-            search: "OG Stoner ",
+            search: "OG Stoner",
         };
     },
     computed: {
         fill() {
+            // let len = this.checked.bg.length()
             if (!this.search) {
                 return testjson;
             } else {
@@ -469,21 +471,21 @@ export default {
             document.body.classList.remove("no-scroll");
             this.openFilter = false;
         },
-        filterMe(val) {
-            this.searched = this.users;
+        // filterMe(val) {
+        //     this.searched = this.users;
 
-            this.searched = this.users.filter((e) => {
-                e.metadata.attributes.forEach((el) => el.value.includes(val));
-            });
+        //     this.searched = this.users.filter((e) => {
+        //         e.metadata.attributes.forEach((el) => el.value.includes(val));
+        //     });
 
-            // if (val !== "") {
-            //     this.users = this.users.filter((ele) => {
-            //         ele.metadata.attributes.forEach((s) => {
-            //             s.value.includes(val);
-            //         });
-            //     });
-            // }
-        },
+        //     // if (val !== "") {
+        //     //     this.users = this.users.filter((ele) => {
+        //     //         ele.metadata.attributes.forEach((s) => {
+        //     //             s.value.includes(val);
+        //     //         });
+        //     //     });
+        //     // }
+        // },
 
         // checkNow() {
         //     this.users.forEach((element) => {
